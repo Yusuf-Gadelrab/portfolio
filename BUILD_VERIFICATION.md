@@ -19,6 +19,7 @@ seo_site/
 │   ├── local-language-models-private-data/index.html
 │   └── bilingual-programming-syntax/index.html
 ├── yusuf_headshot.jpg
+├── yusuf-headshot.jpg
 ├── PUBLISH.md
 └── BUILD_VERIFICATION.md
 ```
