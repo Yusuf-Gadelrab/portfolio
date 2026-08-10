@@ -1,5 +1,28 @@
 # SEO site build verification
 
+## File tree
+
+```text
+seo_site/
+├── .nojekyll
+├── 404.html
+├── about/index.html
+├── favicon.svg
+├── index.html
+├── intakekit/index.html
+├── research/index.html
+├── robots.txt
+├── sitemap.xml
+├── writing/
+│   ├── index.html
+│   ├── parsing-freight-messages/index.html
+│   ├── local-language-models-private-data/index.html
+│   └── bilingual-programming-syntax/index.html
+├── yusuf_headshot.jpg
+├── PUBLISH.md
+└── BUILD_VERIFICATION.md
+```
+
 ## Target-keyword map
 
 | URL | Primary target keyword | Supporting terms |
@@ -20,8 +43,9 @@
 - Canonicals, Open Graph tags, Twitter card tags, and descriptive headshot alt text are present.
 - Every JSON-LD block parses as valid JSON.
 - Internal links point to existing local pages.
+- Every planned public route returned HTTP 200 from a local static preview.
 - `robots.txt`, `sitemap.xml`, `.nojekyll`, `PUBLISH.md`, favicon, and the supplied `yusuf_headshot.jpg` asset are present.
 - No `lorem` or `TODO` placeholder text was found in site HTML.
-- Visible article-body counts: freight parsing 934 words; local models 925 words; bilingual programming 958 words. Both research summaries are within the requested 300–500-word range.
+- Visible article-body counts: freight parsing 928 words; local models 925 words; bilingual programming 957 words. Both research summaries are within the requested 300–500-word range.
 
 Run `python /home/user/workspace/validate_seo_site.py` from this workspace to repeat the structural checks.
