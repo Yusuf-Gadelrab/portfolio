@@ -84,4 +84,10 @@
     <loc>https://yusuf-gadelrab.github.io/portfolio/writing/tutoring-cs-bilingual-students/</loc>
     <lastmod>2026-08-12</lastmod>
   </url>
+  <url>
+    <loc>https://yusuf-gadelrab.github.io/portfolio/writing/api-integration-contract-tests/</loc>
+    <lastmod>2026-08-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>
