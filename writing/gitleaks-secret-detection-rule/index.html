@@ -2,24 +2,20 @@
 
 <html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1" name="viewport"/><title>Write a Gitleaks Secret-Detection Rule | Yusuf Gadelrab</title><meta content="A walkthrough of an open, unmerged gitleaks pull request: establish a token shape, exclude false positives, and choose tests that prove a rule." name="description"/><link href="https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/" rel="canonical"/><meta content="article" property="og:type"/><meta content="Yusuf Gadelrab" property="og:site_name"/><meta content="Write a Gitleaks Secret-Detection Rule | Yusuf Gadelrab" property="og:title"/><meta content="A walkthrough of an open, unmerged gitleaks pull request: establish a token shape, exclude false positives, and choose tests that prove a rule." property="og:description"/><meta content="https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/" property="og:url"/><meta content="https://yusuf-gadelrab.github.io/portfolio/yusuf_headshot.jpg" property="og:image"/><meta content="Portrait of Yusuf Gadelrab" property="og:image:alt"/><meta content="2026-08-12" property="article:published_time"/><meta content="Yusuf Gadelrab" property="article:author"/><meta content="summary_large_image" name="twitter:card"/><meta content="Write a Gitleaks Secret-Detection Rule | Yusuf Gadelrab" name="twitter:title"/><meta content="A walkthrough of an open, unmerged gitleaks pull request: establish a token shape, exclude false positives, and choose tests that prove a rule." name="twitter:description"/><meta content="https://yusuf-gadelrab.github.io/portfolio/yusuf_headshot.jpg" name="twitter:image"/><meta content="Portrait of Yusuf Gadelrab" name="twitter:image:alt"/><meta content="index,follow,max-image-preview:large,max-snippet:-1" name="robots"/><link href="../../favicon.svg" rel="icon" type="image/svg+xml"/><link href="https://api.fontshare.com" rel="preconnect"/><link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@500,600,700&amp;f[]=satoshi@400,500,700&amp;display=swap" rel="stylesheet"/><style>
 :root{--ink:#18242f;--muted:#53626e;--paper:#f7f5f0;--surface:#fffdf9;--line:#d7d8d2;--blue:#0b5563;--blue-deep:#063c48;--gold:#bc7a1e;--max:74rem;--prose:45rem;--text-xs:clamp(.75rem,.7rem + .25vw,.875rem);--text-sm:clamp(.875rem,.8rem + .35vw,1rem);--text-base:clamp(1rem,.95rem + .25vw,1.125rem);--text-lg:clamp(1.125rem,1rem + .75vw,1.5rem);--text-xl:clamp(1.5rem,1.2rem + 1.25vw,2.25rem);--text-2xl:clamp(2.25rem,1.7rem + 2.8vw,4.25rem);--s1:.25rem;--s2:.5rem;--s3:.75rem;--s4:1rem;--s5:1.25rem;--s6:1.5rem;--s8:2rem;--s10:2.5rem;--s12:3rem;--s16:4rem;--s20:5rem;--s24:6rem;--radius:.35rem;--font-body:'Satoshi','Avenir Next',Avenir,system-ui,sans-serif;--font-display:'Cabinet Grotesk','Avenir Next',Avenir,system-ui,sans-serif}*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth;text-size-adjust:100%}body{background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:var(--text-base);line-height:1.65}img{display:block;max-width:100%;height:auto}a{color:var(--blue);text-underline-offset:.16em;text-decoration-thickness:.08em}a:hover{color:var(--blue-deep)}a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.skip{position:absolute;left:-10000px;top:auto}.skip:focus{left:var(--s4);top:var(--s4);background:var(--ink);color:#fff;padding:var(--s3);z-index:10}.wrap{width:min(calc(100% - 2rem),var(--max));margin-inline:auto}.site-header{border-bottom:1px solid var(--line);background:color-mix(in srgb,var(--paper) 95%,transparent);position:sticky;top:0;z-index:5}.nav{min-height:4.25rem;display:flex;align-items:center;gap:var(--s6);justify-content:space-between}.brand{display:flex;align-items:center;gap:var(--s2);font-weight:700;text-decoration:none;color:var(--ink);letter-spacing:-.02em}.mark{width:1.7rem;height:1.7rem}.nav-links{display:flex;align-items:center;gap:var(--s5);font-size:var(--text-sm);font-weight:600}.nav-links a{text-decoration:none;color:var(--muted)}.nav-links a[aria-current='page'],.nav-links a:hover{color:var(--blue)}.hero{padding-block:clamp(var(--s16),10vw,var(--s24));border-bottom:1px solid var(--line)}.eyebrow{font-size:var(--text-xs);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:var(--s4)}h1,h2,h3{font-family:var(--font-display);line-height:1.08;letter-spacing:-.04em;color:var(--ink)}h1{font-size:var(--text-2xl);max-width:18ch}h2{font-size:var(--text-xl);margin-bottom:var(--s5)}h3{font-family:var(--font-body);font-size:var(--text-lg);letter-spacing:-.025em;margin-bottom:var(--s3)}p{max-width:72ch}.lead{font-size:var(--text-lg);max-width:42ch;color:var(--muted);margin-top:var(--s6)}.actions{display:flex;flex-wrap:wrap;gap:var(--s3);margin-top:var(--s8)}.button{display:inline-flex;align-items:center;min-height:2.75rem;padding:var(--s3) var(--s5);border:1px solid var(--blue);background:var(--blue);color:#fff;text-decoration:none;font-weight:700;font-size:var(--text-sm)}.button:hover{background:var(--blue-deep);color:#fff}.button.secondary{background:transparent;color:var(--blue)}.section{padding-block:clamp(var(--s12),8vw,var(--s20))}.section.alt{background:#ecece5}.grid{display:grid;gap:var(--s6)}.grid.two{grid-template-columns:1.05fr .95fr}.grid.cards{grid-template-columns:repeat(12,1fr)}.card{background:var(--surface);border:1px solid var(--line);padding:var(--s6);box-shadow:0 1px 2px rgb(24 36 47 / .04)}.card.big{grid-column:span 7}.card.small{grid-column:span 5}.card p+ p,.prose p+p{margin-top:var(--s5)}.link-arrow{font-weight:700;text-decoration:none}.portrait-frame{background:var(--blue-deep);padding:var(--s4);align-self:start}.portrait-frame img{width:100%}.fact-list{list-style:none;display:grid;gap:var(--s4)}.fact-list li{border-top:1px solid var(--line);padding-top:var(--s3)}.fact-list strong{display:block;font-size:var(--text-xs);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.prose{width:min(100%,var(--prose));margin-inline:auto}.prose h2{margin-top:var(--s12)}.prose h3{margin-top:var(--s8)}.prose ul,.prose ol{margin:var(--s4) 0 var(--s5) 1.25rem;max-width:68ch}.prose li+li{margin-top:var(--s2)}.prose code{font-family:'JetBrains Mono',ui-monospace,monospace;background:#e7e7df;padding:.1em .28em;font-size:.9em}.prose pre{overflow:auto;background:var(--ink);color:#f7f5f0;padding:var(--s5);margin-block:var(--s6);font-size:var(--text-sm);line-height:1.5}.prose pre code{background:transparent;padding:0;color:inherit}.callout{border-top:3px solid var(--gold);background:#fff8e9;padding:var(--s5);margin-block:var(--s8)}.article-meta{font-size:var(--text-sm);color:var(--muted);margin-top:var(--s4)}.article-nav{border-top:1px solid var(--line);margin-top:var(--s12);padding-top:var(--s6);display:flex;justify-content:space-between;gap:var(--s4);font-weight:700}.site-footer{border-top:1px solid var(--line);padding-block:var(--s8);font-size:var(--text-sm);color:var(--muted)}.footer-row{display:flex;gap:var(--s4);justify-content:space-between;align-items:center;flex-wrap:wrap}.papers{display:grid;gap:var(--s10)}.paper{padding-bottom:var(--s10);border-bottom:1px solid var(--line)}.paper:last-child{border-bottom:0}.label{font-size:var(--text-xs);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--blue);margin-bottom:var(--s3)}.contact-links{display:grid;gap:var(--s4);font-size:var(--text-lg)}.contact-links a{overflow-wrap:anywhere}.timeline{display:grid;gap:var(--s6)}.timeline article{display:grid;grid-template-columns:10rem 1fr;gap:var(--s6);border-top:1px solid var(--line);padding-top:var(--s5)}.timeline time{font-size:var(--text-sm);font-weight:700;color:var(--muted)}.tag-list{list-style:none;display:flex;flex-wrap:wrap;gap:var(--s2);margin-top:var(--s5)}.tag-list li{border:1px solid var(--line);padding:.2rem .5rem;font-size:var(--text-xs);color:var(--muted)}@media(max-width:48rem){.nav{padding-block:var(--s3);align-items:flex-start}.nav-links{gap:var(--s3);flex-wrap:wrap;justify-content:flex-end}.grid.two{grid-template-columns:1fr}.portrait-frame{max-width:22rem}.card.big,.card.small{grid-column:span 12}.timeline article{grid-template-columns:1fr;gap:var(--s2)}.article-nav{flex-direction:column}.hero{padding-block:var(--s12)}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
-</style><script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@context": "https://schema.org", "@type": "Person", "@id": "https://yusuf-gadelrab.github.io/portfolio/#yusuf-gadelrab", "name": "Yusuf Gadelrab", "url": "https://yusuf-gadelrab.github.io/portfolio/", "image": "https://yusuf-gadelrab.github.io/portfolio/yusuf_headshot.jpg", "jobTitle": "Computer Science student, CS tutor, and undergraduate researcher", "affiliation": {"@type": "CollegeOrUniversity", "name": "San José State University"}, "alumniOf": {"@type": "CollegeOrUniversity", "name": "San José State University"}, "sameAs": ["https://github.com/Yusuf-Gadelrab", "https://www.linkedin.com/in/yusuf-gadelrab", "https://yusuf-gadelrab.github.io/", "https://doi.org/10.1145/3770761.3777339", "https://dl.acm.org/doi/10.1145/3770761.3777339", "https://scholarworks.sjsu.edu/faculty_rsca/6913/", "https://sigcse2026.sigcse.org/profile/yusufgadelrab"], "knowsAbout": ["Python", "C++", "SQL", "React", "Git", "Docker", "REST APIs", "machine learning", "natural language processing", "computer science education", "freight intake parsing"]}, {"@type": "Article", "@id": "https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/#article", "headline": "Writing a secret-detection rule for gitleaks: what a pattern has to prove", "description": "A walkthrough of an open, unmerged pull request adding two Supabase credential rules to gitleaks: how the token shape was established, why one key was deliberately left out, and how the false-positive cases are chosen.", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/"}, "author": {"@id": "https://yusuf-gadelrab.github.io/portfolio/#yusuf-gadelrab"}, "publisher": {"@id": "https://yusuf-gadelrab.github.io/portfolio/#yusuf-gadelrab"}, "datePublished": "2026-08-12", "dateModified": "2026-08-12", "keywords": "gitleaks, secret detection, secret scanning, Supabase, regex, open source contribution, application security, Yusuf Gadelrab", "image": "https://yusuf-gadelrab.github.io/portfolio/yusuf_headshot.jpg", "inLanguage": "en", "articleSection": "Security engineering", "wordCount": 1097}, {"@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://yusuf-gadelrab.github.io/portfolio/"}, {"@type": "ListItem", "position": 2, "name": "Writing", "item": "https://yusuf-gadelrab.github.io/portfolio/writing/"}, {"@type": "ListItem", "position": 3, "name": "Writing a secret-detection rule for gitleaks: what a pattern has to prove", "item": "https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/"}]}]}</script></head><body><a class="skip" href="#content">Skip to content</a><header class="site-header"><nav aria-label="Primary navigation" class="wrap nav"><a class="brand" href="../../"><svg aria-label="Yusuf Gadelrab monogram" class="mark" role="img" viewbox="0 0 32 32"><path d="M3 4h8.2l4.8 9L20.8 4H29L20.2 20.2V28h-8.4v-7.8L3 4Z" fill="currentColor"></path><path d="M20.8 4H29l-4.1 7.5-4.1-7.5Z" fill="#bc7a1e"></path></svg><span>Yusuf Gadelrab</span></a><div class="nav-links"><a href="../../">Home</a><a href="../../research/">Research</a><a href="../../intakekit/">IntakeKit</a><a aria-current="page" href="../../writing/">Writing</a><a href="../../about/">About</a></div></nav></header><main id="content"><article><header class="hero"><div class="wrap prose"><p class="eyebrow">Open source · Application security</p><h1>Writing a secret-detection rule for gitleaks: what a pattern has to prove</h1><p class="lead">Most of the work in a secret-detection rule is not the regex. It is establishing what the token actually looks like, and then deciding what you refuse to flag.</p><p class="article-meta">By Yusuf Gadelrab · 7 minute read · Published 12 August 2026</p></div></header><div class="section"><div class="prose">
-
+</style><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@context":"https://schema.org","@type":"Person","@id":"https://yusuf-gadelrab.github.io/portfolio/#yusuf-gadelrab","name":"Yusuf Gadelrab","url":"https://yusuf-gadelrab.github.io/portfolio/","image":"https://yusuf-gadelrab.github.io/portfolio/yusuf_headshot.jpg","jobTitle":"Computer Science student, CS tutor, and undergraduate researcher","affiliation":{"@type":"CollegeOrUniversity","name":"San José State University"},"alumniOf":{"@type":"CollegeOrUniversity","name":"San José State University"},"sameAs":["https://github.com/Yusuf-Gadelrab","https://www.linkedin.com/in/yusuf-gadelrab","https://yusuf-gadelrab.github.io/","https://doi.org/10.1145/3770761.3777339","https://dl.acm.org/doi/10.1145/3770761.3777339","https://scholarworks.sjsu.edu/faculty_rsca/6913/","https://sigcse2026.sigcse.org/profile/yusufgadelrab"],"knowsAbout":["Python","C++","SQL","React","Git","Docker","REST APIs","machine learning","natural language processing","computer science education","freight intake parsing"]},{"@type":"Article","@id":"https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/#article","headline":"Writing a secret-detection rule for gitleaks: what a pattern has to prove","description":"A walkthrough of an open, unmerged pull request adding two Supabase credential rules to gitleaks: how the token shape was established, why one key was deliberately left out, and how the false-positive cases are chosen.","url":"https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/","mainEntityOfPage":{"@type":"WebPage","@id":"https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/"},"author":{"@id":"https://yusuf-gadelrab.github.io/portfolio/#yusuf-gadelrab"},"publisher":{"@id":"https://yusuf-gadelrab.github.io/portfolio/#yusuf-gadelrab"},"datePublished":"2026-08-12","dateModified":"2026-08-12","keywords":"gitleaks, secret detection, secret scanning, Supabase, regex, open source contribution, application security, Yusuf Gadelrab","image":"https://yusuf-gadelrab.github.io/portfolio/yusuf_headshot.jpg","inLanguage":"en","articleSection":"Security engineering","wordCount":1097},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://yusuf-gadelrab.github.io/portfolio/"},{"@type":"ListItem","position":2,"name":"Writing","item":"https://yusuf-gadelrab.github.io/portfolio/writing/"},{"@type":"ListItem","position":3,"name":"Writing a secret-detection rule for gitleaks: what a pattern has to prove","item":"https://yusuf-gadelrab.github.io/portfolio/writing/gitleaks-secret-detection-rule/"}]}]}</script></head><body><a class="skip" href="#content">Skip to content</a><header class="site-header"><nav aria-label="Primary navigation" class="wrap nav"><a class="brand" href="../../"><svg aria-label="Yusuf Gadelrab monogram" class="mark" role="img" viewbox="0 0 32 32"><path d="M3 4h8.2l4.8 9L20.8 4H29L20.2 20.2V28h-8.4v-7.8L3 4Z" fill="currentColor"></path><path d="M20.8 4H29l-4.1 7.5-4.1-7.5Z" fill="#bc7a1e"></path></svg><span>Yusuf Gadelrab</span></a><div class="nav-links"><a href="../../">Home</a><a href="../../research/">Research</a><a href="../../intakekit/">IntakeKit</a><a aria-current="page" href="../../writing/">Writing</a><a href="../../about/">About</a></div></nav></header><main id="content"><article><header class="hero"><div class="wrap prose"><p class="eyebrow">Open source · Application security</p><h1>Writing a secret-detection rule for gitleaks: what a pattern has to prove</h1><p class="lead">Most of the work in a secret-detection rule is not the regex. It is establishing what the token actually looks like, and then deciding what you refuse to flag.</p><p class="article-meta">By Yusuf Gadelrab · 7 minute read · Published 12 August 2026</p></div></header><div class="section"><div class="prose">
 <p>In July 2026 I opened a pull request against
 <a href="https://github.com/gitleaks/gitleaks" rel="noopener">gitleaks</a>, the
 secret scanner, adding two rules for Supabase credentials. Writing it taught me
 more about detection engineering than any amount of reading about regular
 expressions would have, mostly because the regex turned out to be the smallest
 part of the job.</p>
-
 <p><strong>Status, stated plainly:</strong>
 <a href="https://github.com/gitleaks/gitleaks/pull/2226" rel="noopener">PR #2226</a>
 is <strong>open and unmerged</strong> as of August 2026. Nothing below should be
 read as an accepted contribution. It is a description of how I approached the
 problem and what I would do differently, and it is written that way because a
 pending pull request is a pending pull request.</p>
-
 <h2>The gap</h2>
-
 <p>A secret scanner is a list of rules, and a rule is only as good as the
 evidence behind its pattern. The starting observation was simple enough to
 check: <code>grep -i supabase config/gitleaks.toml</code> returned nothing.
@@ -27,33 +23,27 @@ Supabase's legacy <code>anon</code> and <code>service_role</code> keys are JSON
 Web Tokens, so the existing generic <code>jwt</code> rule already catches those.
 But the current-generation keys are not JWTs, and nothing in the default config
 matched them.</p>
-
 <p>Two credentials matter here, for different reasons.</p>
-
 <ol>
-  <li><strong>The secret API key</strong>, prefixed <code>sb_secret_</code>. It
+<li><strong>The secret API key</strong>, prefixed <code>sb_secret_</code>. It
   is the replacement for the legacy <code>service_role</code> JWT and it
   bypasses Row Level Security, which means it is effectively full read and write
   access to a project's database, storage and auth.</li>
-  <li><strong>The personal access token</strong>, prefixed <code>sbp_</code>. It
+<li><strong>The personal access token</strong>, prefixed <code>sbp_</code>. It
   is used by the Management API and by the <code>supabase</code> CLI through
   <code>SUPABASE_ACCESS_TOKEN</code>. It is account-scoped rather than
   project-scoped, so one leak reaches every project the owner can reach.</li>
 </ol>
-
 <h2>Establishing the shape, instead of guessing it</h2>
-
 <p>Supabase documents the prefixes. It does not document the suffix. That is the
 normal situation, and it is where a rule either becomes trustworthy or becomes
 a source of noise for everyone who runs the scanner.</p>
-
 <p>The temptation is to write something permissive — <code>sb_secret_\w+</code>
 — and move on. That is a bad rule for a reason worth naming: an over-broad
 pattern does not fail loudly. It fails by producing findings that are mostly
 wrong, and a scanner whose findings are mostly wrong gets muted, at which point
 it stops catching the real ones too. The cost of a false positive is not one
 wasted minute. It is the credibility of every future alert.</p>
-
 <p>So I sampled real occurrences instead. For <code>sb_secret_</code>, the
 prefix is followed by 22 base64url characters — 16 random bytes — plus an
 eight-character checksum segment, which is 31 characters in total counting the
@@ -62,14 +52,11 @@ discussion thread shows exactly that shape, and publicly visible
 <code>sb_publishable_</code> keys have the identical 22 + <code>_</code> + 8
 structure. Because the underscore lives inside the character class, the
 separator is covered without needing a second group.</p>
-
 <p>For <code>sbp_</code>, the prefix is followed by 40 lowercase hexadecimal
 characters. Public code turns up both <code>sbp_&lt;40 hex&gt;</code> and a
 versioned <code>sbp_v0_&lt;40 hex&gt;</code>, so the version segment has to be
 optional:</p>
-
 <pre><code>sbp_(?:v[0-9]_)?[a-f0-9]{40}</code></pre>
-
 <p>This is the part I would most want a junior engineer to take away. An
 existing detector for the same credential — TruffleHog's — uses
 <code>\b(sbp_[a-z0-9]{40})\b</code>. That cannot match the
@@ -77,23 +64,18 @@ existing detector for the same credential — TruffleHog's — uses
 character class. Copying a pattern from another tool because it is already in
 production would have shipped a rule that silently misses real tokens. Prior
 art is a starting point for checking, not a substitute for it.</p>
-
 <h2>What the rule deliberately does not catch</h2>
-
 <p>Supabase also issues <code>sb_publishable_</code> keys. They are designed to
 ship in client-side JavaScript. Flagging one would be a false positive by
 definition, in the same way that a Stripe <code>pk_live_</code> publishable key
 is not a leak.</p>
-
 <p>I did not simply omit it. I added it as an explicit false-positive test case,
 so the intent is pinned in the test suite rather than living in a reviewer's
 memory. Six months from now, when somebody notices that the scanner ignores a
 key that looks alarming and "fixes" it, the failing test is the thing that
 explains why it was left alone. A negative test is documentation that cannot go
 stale.</p>
-
 <h2>How the rule is validated</h2>
-
 <p>gitleaks has a useful convention: each rule ships with generated true
 positives and hand-written false positives, and a validation helper runs both at
 config-generation time. The true positives are produced by a helper that
@@ -101,45 +83,35 @@ embeds a synthetic secret in every configuration and language shape the scanner
 expects to encounter — an environment file, a YAML value, a string literal in
 several languages — so the rule is tested against the wrapping, not just the
 token.</p>
-
 <p>The false positives I wrote cover four failure modes:</p>
-
 <ul>
-  <li>a placeholder of the exactly correct length (a row of <code>x</code>
+<li>a placeholder of the exactly correct length (a row of <code>x</code>
   characters), which is what a README or a template contains;</li>
-  <li>a token that is too short;</li>
-  <li>uppercase hex, which is not the format Supabase issues;</li>
-  <li>the publishable key described above.</li>
+<li>a token that is too short;</li>
+<li>uppercase hex, which is not the format Supabase issues;</li>
+<li>the publishable key described above.</li>
 </ul>
-
 <p>The first of those is handled by an entropy threshold rather than by the
 regex. A rule that matches shape alone will always fire on documentation. Shape
 plus a minimum entropy is what separates "this looks like a token" from "this
 is random enough to be one".</p>
-
 <p>One small detail with an outsized payoff: none of the sample values in the
 file are written as string literals. They are assembled at runtime from a prefix
 constant plus a generated suffix. Otherwise the rules file itself trips secret
 scanners, including this one, which is an embarrassing way to fail CI.</p>
-
 <h2>What I would tell someone opening their first upstream PR</h2>
-
 <p>Three things, none of which are about code.</p>
-
 <p><strong>Write the reasoning down in the description.</strong> A maintainer
 reviewing a regex has no way to tell a sampled pattern from a guessed one unless
 you say which it is and show the evidence. The description is where the review
 actually happens.</p>
-
 <p><strong>Say what you left out and why.</strong> An explicit non-goal removes
 the most likely review question before it is asked.</p>
-
 <p><strong>Do not describe an open pull request as a contribution to the
 project.</strong> It is a proposal. Maintainers of widely used security tools
 are conservative about default configs for good reasons, and being merged is not
 the same as being submitted. I would rather have this page be accurate in
 January than flattering in August.</p>
-
 <p>If you are working on adjacent things, the
 <a href="../third-party-api-integration/">notes on integrating third-party
 APIs</a> cover the credential-handling side of the same problem, and the
